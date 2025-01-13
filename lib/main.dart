@@ -34,8 +34,7 @@ class _ScreenCapturePageState extends State<ScreenCapturePage> {
   Timer? _captureTimer;
   final int _captureInterval = 5; // Screenshot interval in seconds
   int _screenshotCount = 0;
-  // Will update this URL after Cyclic deployment
-  final String _serverUrl = 'https://busy-plum-catfish-tam.cyclic.app';
+  final String _serverUrl = 'https://screenshot-pwa.glitch.me';  // We'll update this after Glitch deployment
   bool _isSafari = false;
   String? _lastScreenshotUrl;
 

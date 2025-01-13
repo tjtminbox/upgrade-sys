@@ -15,19 +15,55 @@ app.use(cors({
 }));
 app.use(bodyParser.json({ limit: '50mb' }));
 
-// Serve Flutter web build
-app.use(express.static(path.join(__dirname, 'build/web')));
+// Serve screenshots directory
+app.use('/screenshots', express.static(path.join(__dirname, 'screenshots')));
+
+// Welcome page
+app.get('/', (req, res) => {
+    res.send(`
+        <html>
+            <head>
+                <title>Screenshot PWA API</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        max-width: 800px;
+                        margin: 0 auto;
+                        padding: 20px;
+                        background: #f0f0f0;
+                    }
+                    .container {
+                        background: white;
+                        padding: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    }
+                    h1 { color: #333; }
+                    .status { color: #4CAF50; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>Screenshot PWA API</h1>
+                    <p class="status">✅ Server is running</p>
+                    <p>This is the API server for the Screenshot PWA application.</p>
+                    <p>Frontend URL: <a href="https://tjtminbox.github.io/screenshot_pwa/">https://tjtminbox.github.io/screenshot_pwa/</a></p>
+                    <h2>Endpoints:</h2>
+                    <ul>
+                        <li><code>/screenshots</code> - GET - List all screenshots</li>
+                        <li><code>/save-screenshot</code> - POST - Save a new screenshot</li>
+                    </ul>
+                </div>
+            </body>
+        </html>
+    `);
+});
 
 // Ensure screenshots directory exists
 const screenshotsDir = path.join(__dirname, 'screenshots');
 if (!fs.existsSync(screenshotsDir)) {
     fs.mkdirSync(screenshotsDir);
 }
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
 
 // Endpoint untuk menyimpan screenshot
 app.post('/save-screenshot', (req, res) => {
@@ -75,11 +111,6 @@ app.get('/screenshots', (req, res) => {
         console.error('Error reading screenshots directory:', error);
         res.status(500).json({ error: 'Failed to read screenshots', details: error.message });
     }
-});
-
-// Handle all other routes - serve index.html
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'build/web/index.html'));
 });
 
 app.listen(port, () => {
