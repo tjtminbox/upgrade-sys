@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-    origin: '*',
+    origin: ['https://tjtminbox.github.io', 'http://localhost:3000'],
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Accept', 'Cache-Control']
 }));

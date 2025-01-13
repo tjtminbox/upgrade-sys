@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: screenshot-pwa-api
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 3000
+    disk:
+      name: screenshots
+      mountPath: /app/screenshots
+      sizeGB: 1
