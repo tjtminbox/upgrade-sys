@@ -9,9 +9,20 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-    origin: ['https://tjtminbox.github.io', 'http://localhost:3000'],
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Accept', 'Cache-Control']
+    origin: function(origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if(!origin) return callback(null, true);
+        
+        // Allow all localhost origins
+        if(origin.match(/^http:\/\/localhost(:[0-9]+)?$/)) {
+            return callback(null, true);
+        }
+        
+        callback(new Error('Not allowed by CORS'));
+    },
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Accept', 'Cache-Control'],
+    credentials: true
 }));
 app.use(bodyParser.json({ limit: '50mb' }));
 

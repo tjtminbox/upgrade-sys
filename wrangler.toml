@@ -1,0 +1,14 @@
+name = "screenshot-pwa"
+type = "webpack"
+account_id = "" # You'll need to add your Cloudflare account ID here
+workers_dev = true
+route = ""
+zone_id = ""
+
+[site]
+bucket = "./build/web"
+entry-point = "workers-site"
+
+[build]
+command = "flutter build web --release"
+output_dir = "build/web"
