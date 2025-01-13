@@ -5,17 +5,21 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Accept', 'Cache-Control']
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Accept', 'Cache-Control']
 }));
 app.use(bodyParser.json({ limit: '50mb' }));
-app.use(express.static('web')); // Serve Flutter web build
-app.use('/screenshots', express.static(path.join(__dirname, 'screenshots'))); // Serve screenshots directory
+
+// Serve Flutter web build
+app.use(express.static(path.join(__dirname, 'build/web')));
+
+// Serve screenshots directory
+app.use('/screenshots', express.static(path.join(__dirname, 'screenshots')));
 
 // Ensure screenshots directory exists
 const screenshotsDir = path.join(__dirname, 'screenshots');
@@ -69,6 +73,11 @@ app.get('/screenshots', (req, res) => {
         console.error('Error reading screenshots directory:', error);
         res.status(500).json({ error: 'Failed to read screenshots', details: error.message });
     }
+});
+
+// Handle all other routes - serve index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'build/web/index.html'));
 });
 
 app.listen(port, () => {
