@@ -34,7 +34,7 @@ class _ScreenCapturePageState extends State<ScreenCapturePage> {
   Timer? _captureTimer;
   final int _captureInterval = 5; // Screenshot interval in seconds
   int _screenshotCount = 0;
-  final String _serverUrl = 'http://localhost:3000';
+  final String _serverUrl = 'https://screenshot-pwa-api.onrender.com';
   bool _isSafari = false;
   String? _lastScreenshotUrl;
 
