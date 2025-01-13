@@ -34,7 +34,8 @@ class _ScreenCapturePageState extends State<ScreenCapturePage> {
   Timer? _captureTimer;
   final int _captureInterval = 5; // Screenshot interval in seconds
   int _screenshotCount = 0;
-  final String _serverUrl = 'https://screenshot-pwa-api.onrender.com';
+  // Will update this URL after Cyclic deployment
+  final String _serverUrl = 'https://busy-plum-catfish-tam.cyclic.app';
   bool _isSafari = false;
   String? _lastScreenshotUrl;
 

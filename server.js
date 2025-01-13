@@ -18,14 +18,16 @@ app.use(bodyParser.json({ limit: '50mb' }));
 // Serve Flutter web build
 app.use(express.static(path.join(__dirname, 'build/web')));
 
-// Serve screenshots directory
-app.use('/screenshots', express.static(path.join(__dirname, 'screenshots')));
-
 // Ensure screenshots directory exists
 const screenshotsDir = path.join(__dirname, 'screenshots');
 if (!fs.existsSync(screenshotsDir)) {
     fs.mkdirSync(screenshotsDir);
 }
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // Endpoint untuk menyimpan screenshot
 app.post('/save-screenshot', (req, res) => {
