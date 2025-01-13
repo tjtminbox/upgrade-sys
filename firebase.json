@@ -1,1 +1,0 @@
-{"hosting":{"public":"public","ignore":["firebase.json","**/.*","**/node_modules/**"],"rewrites":[{"source":"**","destination":"/index.html"}]},"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"screenshot-pwa","configurations":{"web":"1:317619733421:web:57b8475234b9ad57b71724"}}}}}}
