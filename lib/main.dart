@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:html' as html;
 import 'dart:js' as js;
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class _ScreenCapturePageState extends State<ScreenCapturePage> {
   Timer? _captureTimer;
   final int _captureInterval = 5; // Screenshot interval in seconds
   int _screenshotCount = 0;
-  final String _serverUrl = 'https://screenshot-pwa.glitch.me';  // We'll update this after Glitch deployment
+  final String _serverUrl = 'http://localhost:3000';  // Local development server
   bool _isSafari = false;
   String? _lastScreenshotUrl;
 
