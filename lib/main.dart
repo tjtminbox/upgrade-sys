@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:html' as html;
 import 'dart:js' as js;
 import 'package:flutter/material.dart';
@@ -12,10 +13,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Screenshot Auto',
+      title: 'Screenshot PWA',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        brightness: Brightness.dark,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: const ScreenCapturePage(),
     );
@@ -145,7 +146,7 @@ class _ScreenCapturePageState extends State<ScreenCapturePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Screenshot Auto'),
+        title: const Text('Screenshot PWA'),
       ),
       body: Center(
         child: Column(
