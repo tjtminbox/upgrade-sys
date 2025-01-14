@@ -15,20 +15,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Setup Flutter SDK
-        uses: flutter-actions/setup-flutter@v2
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.27.1'
           channel: 'stable'
           cache: true
-          
-      - name: Install dependencies
-        run: |
-          flutter config --no-analytics
-          flutter config --enable-web
-          flutter pub get
-          
+      
+      - name: Enable web
+        run: flutter config --enable-web
+        
+      - name: Get dependencies
+        run: flutter pub get
+        
       - name: Build web
         run: |
           flutter build web --release
