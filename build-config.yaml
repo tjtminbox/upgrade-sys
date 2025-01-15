@@ -1,0 +1,5 @@
+build:
+  command: bash ./build.sh
+  output: build/web
+  environment:
+    NODE_VERSION: 18
