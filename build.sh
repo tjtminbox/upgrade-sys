@@ -1,12 +1,18 @@
 #!/bin/bash
-# Install Flutter
-git clone https://github.com/flutter/flutter.git
-export PATH="$PATH:`pwd`/flutter/bin"
-flutter doctor
-flutter channel stable
-flutter upgrade
+# Exit on error
+set -e
 
-# Build the web app
+echo "Starting build process..."
+
+# Install Flutter
+echo "Downloading Flutter..."
+git clone https://github.com/flutter/flutter.git --depth 1 -b stable
+export PATH="$PATH:`pwd`/flutter/bin"
+
+echo "Running Flutter doctor..."
+flutter doctor
+
+echo "Building web app..."
 flutter build web --release
 
-# The build output will be in the build/web directory
+echo "Build completed. Output directory: build/web"
