@@ -6,11 +6,11 @@ echo "Starting build process..."
 
 # Install Flutter
 echo "Downloading Flutter..."
-git clone https://github.com/flutter/flutter.git --depth 1 -b stable
-export PATH="$PATH:$(pwd)/flutter/bin"
+git clone https://github.com/flutter/flutter.git --depth 1 -b stable /opt/flutter
+export PATH="$PATH:/opt/flutter/bin"
 
 echo "Running Flutter doctor..."
-flutter doctor
+flutter doctor -v
 
 echo "Building web app..."
 flutter build web --release
