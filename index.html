@@ -3,19 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Screenshot PWA</title>
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#2196F3">
+    <title>Screenshot Gallery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .screenshot {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .screenshot img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .screenshot p {
+            margin: 10px 0;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Screenshot PWA</h1>
-    <p>Loading...</p>
+    <h1>Screenshot Gallery</h1>
+    <div class="gallery" id="gallery"></div>
+
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js');
-            });
+        async function loadScreenshots() {
+            try {
+                const response = await fetch('/screenshots');
+                const data = await response.json();
+                const gallery = document.getElementById('gallery');
+                
+                data.forEach(filename => {
+                    const div = document.createElement('div');
+                    div.className = 'screenshot';
+                    
+                    const img = document.createElement('img');
+                    img.src = `/screenshots/${filename}`;
+                    img.alt = filename;
+                    
+                    const p = document.createElement('p');
+                    p.textContent = filename;
+                    
+                    div.appendChild(img);
+                    div.appendChild(p);
+                    gallery.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading screenshots:', error);
+            }
         }
+
+        window.addEventListener('load', loadScreenshots);
     </script>
 </body>
 </html>

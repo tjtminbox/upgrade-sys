@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
@@ -25,6 +25,9 @@ app.use(cors({
     credentials: true
 }));
 app.use(bodyParser.json({ limit: '50mb' }));
+
+// Serve static files from the root directory
+app.use(express.static(__dirname));
 
 // Serve screenshots directory
 app.use('/screenshots', express.static(path.join(__dirname, 'screenshots')));
@@ -107,20 +110,14 @@ app.post('/save-screenshot', (req, res) => {
     }
 });
 
-// Endpoint untuk mendapatkan daftar screenshot
-app.get('/screenshots', (req, res) => {
+// API endpoint to get list of screenshots
+app.get('/screenshots', async (req, res) => {
     try {
-        const files = fs.readdirSync(screenshotsDir)
-            .filter(file => file.endsWith('.png'))
-            .map(file => ({
-                name: file,
-                url: `/screenshots/${file}`,
-                timestamp: file.split('_')[1]
-            }));
-        res.json({ screenshots: files });
+        const files = await fs.readdir(path.join(__dirname, 'screenshots'));
+        res.json(files);
     } catch (error) {
         console.error('Error reading screenshots directory:', error);
-        res.status(500).json({ error: 'Failed to read screenshots', details: error.message });
+        res.status(500).json({ error: 'Failed to read screenshots' });
     }
 });
 
