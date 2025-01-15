@@ -6,6 +6,8 @@ echo "Starting build process..."
 
 # Install Flutter
 echo "Downloading Flutter..."
+sudo mkdir -p /opt/flutter
+sudo chown -R $(whoami) /opt/flutter
 git clone https://github.com/flutter/flutter.git --depth 1 -b stable /opt/flutter
 export PATH="$PATH:/opt/flutter/bin"
 

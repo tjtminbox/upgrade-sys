@@ -1,5 +1,5 @@
 name = "screenshot-pwa"
-compatibility_date = "2024-01-14"
+compatibility_date = "2024-01-15"
 type = "webpack"
 account_id = "" # You'll need to add your Cloudflare account ID here
 workers_dev = true
@@ -11,5 +11,6 @@ bucket = "./build/web"
 entry-point = "workers-site"
 
 [build]
-command = "flutter build web --release"
+command = "sh build.sh"
 output_dir = "build/web"
+upload.format = "service-worker"
