@@ -1,0 +1,9 @@
+{
+  "name": "screenshot-pwa",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {},
+  "scripts": {
+    "build": "bash ./build.sh"
+  }
+}
