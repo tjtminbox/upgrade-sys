@@ -1,6 +1,0 @@
-build:
-  skip_npm_install: true
-  command: sh build.sh
-  output: build/web
-  environment:
-    NODE_VERSION: 18
