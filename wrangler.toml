@@ -1,0 +1,8 @@
+name = "screenshot-worker"
+main = "worker.js"
+compatibility_date = "2024-01-15"
+
+# KV Namespace binding
+kv_namespaces = [
+  { binding = "SCREENSHOTS", id = "YOUR_KV_NAMESPACE_ID" }
+]
