@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Exit on error
 set -e
 
@@ -7,7 +7,7 @@ echo "Starting build process..."
 # Install Flutter
 echo "Downloading Flutter..."
 git clone https://github.com/flutter/flutter.git --depth 1 -b stable
-export PATH="$PATH:`pwd`/flutter/bin"
+export PATH="$PATH:$(pwd)/flutter/bin"
 
 echo "Running Flutter doctor..."
 flutter doctor
