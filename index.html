@@ -10,6 +10,18 @@
             margin: 20px;
             background: #f0f0f0;
         }
+        .controls {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .filters {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
         .gallery {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -21,50 +33,247 @@
             padding: 10px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .screenshot:hover {
+            transform: translateY(-5px);
         }
         .screenshot img {
             width: 100%;
-            height: auto;
+            height: 200px;
+            object-fit: cover;
             border-radius: 4px;
+            cursor: pointer;
         }
-        .screenshot p {
+        .screenshot .info {
             margin: 10px 0;
             color: #666;
             font-size: 14px;
         }
+        .screenshot .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .screenshot button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            font-size: 12px;
+        }
+        .screenshot button.delete {
+            background: #dc3545;
+        }
+        .screenshot button:hover {
+            opacity: 0.9;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal img {
+            max-width: 90%;
+            max-height: 90vh;
+            margin: auto;
+            display: block;
+            border-radius: 8px;
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
-    <h1>Screenshot Gallery</h1>
+    <div class="controls">
+        <h1>Screenshot Gallery</h1>
+        <div class="filters">
+            <select id="browserFilter">
+                <option value="">All Browsers</option>
+                <option value="chrome">Chrome</option>
+                <option value="safari">Safari</option>
+                <option value="firefox">Firefox</option>
+            </select>
+            <select id="sortOrder">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+            </select>
+        </div>
+    </div>
+    
     <div class="gallery" id="gallery"></div>
+    <div class="modal" id="modal" onclick="closeModal()"></div>
 
     <script>
+        // Replace with your Cloudflare Worker URL
+        const API_URL = 'https://screenshot-worker.your-subdomain.workers.dev/api';
+        let screenshots = [];
+        
         async function loadScreenshots() {
             try {
-                const response = await fetch('/screenshots');
-                const data = await response.json();
-                const gallery = document.getElementById('gallery');
-                
-                data.forEach(filename => {
-                    const div = document.createElement('div');
-                    div.className = 'screenshot';
-                    
-                    const img = document.createElement('img');
-                    img.src = `/screenshots/${filename}`;
-                    img.alt = filename;
-                    
-                    const p = document.createElement('p');
-                    p.textContent = filename;
-                    
-                    div.appendChild(img);
-                    div.appendChild(p);
-                    gallery.appendChild(div);
-                });
+                const response = await fetch(`${API_URL}/screenshots`);
+                screenshots = await response.json();
+                renderGallery();
             } catch (error) {
                 console.error('Error loading screenshots:', error);
+                document.getElementById('gallery').innerHTML = '<p>Error loading screenshots. Please try again later.</p>';
             }
         }
 
+        function renderGallery() {
+            const gallery = document.getElementById('gallery');
+            const browserFilter = document.getElementById('browserFilter').value;
+            const sortOrder = document.getElementById('sortOrder').value;
+            
+            let filteredScreenshots = [...screenshots];
+            
+            // Apply browser filter
+            if (browserFilter) {
+                filteredScreenshots = filteredScreenshots.filter(s => s.browser === browserFilter);
+            }
+            
+            // Apply sort
+            if (sortOrder === 'oldest') {
+                filteredScreenshots.reverse();
+            }
+            
+            gallery.innerHTML = filteredScreenshots.map(screenshot => `
+                <div class="screenshot" id="screenshot-${screenshot.id}">
+                    <img src="${API_URL}/screenshots/${screenshot.id}" 
+                         alt="Screenshot ${screenshot.timestamp}" 
+                         onclick="showModal('${API_URL}/screenshots/${screenshot.id}')">
+                    <div class="info">
+                        <div>Date: ${formatDate(screenshot.timestamp)}</div>
+                        <div>Time: ${formatTime(screenshot.timestamp)}</div>
+                        <div>Browser: ${screenshot.browser}</div>
+                    </div>
+                    <div class="actions">
+                        <button onclick="downloadScreenshot('${API_URL}/screenshots/${screenshot.id}', '${screenshot.id}.png')">Download</button>
+                        <button class="delete" onclick="deleteScreenshot('${screenshot.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatDate(timestamp) {
+            return timestamp.slice(0,4) + '-' + timestamp.slice(4,6) + '-' + timestamp.slice(6,8);
+        }
+
+        function formatTime(timestamp) {
+            return timestamp.slice(8,10) + ':' + timestamp.slice(10,12) + ':' + timestamp.slice(12,14);
+        }
+
+        function showModal(url) {
+            const modal = document.getElementById('modal');
+            modal.innerHTML = `<img src="${url}" alt="Full size screenshot">`;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('active');
+        }
+
+        async function downloadScreenshot(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(downloadUrl);
+            } catch (error) {
+                console.error('Error downloading screenshot:', error);
+            }
+        }
+
+        async function deleteScreenshot(id) {
+            if (!confirm('Are you sure you want to delete this screenshot?')) {
+                return;
+            }
+
+            const screenshotElement = document.getElementById(`screenshot-${id}`);
+            screenshotElement.innerHTML += '<div class="loading">Deleting...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/screenshots/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    screenshots = screenshots.filter(s => s.id !== id);
+                    renderGallery();
+                } else {
+                    alert('Failed to delete screenshot');
+                    screenshotElement.querySelector('.loading').remove();
+                }
+            } catch (error) {
+                console.error('Error deleting screenshot:', error);
+                alert('Error deleting screenshot');
+                screenshotElement.querySelector('.loading').remove();
+            }
+        }
+
+        // Event listeners for filters
+        document.getElementById('browserFilter').addEventListener('change', renderGallery);
+        document.getElementById('sortOrder').addEventListener('change', renderGallery);
+
+        // Handle screenshot capture events from the extension
+        window.addEventListener('message', async function(event) {
+            if (event.data.type === 'screenshot') {
+                try {
+                    const response = await fetch(`${API_URL}/screenshots`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            imageData: event.data.imageData,
+                            browser: event.data.browser || 'unknown'
+                        })
+                    });
+
+                    if (response.ok) {
+                        loadScreenshots(); // Refresh the gallery
+                    } else {
+                        console.error('Failed to save screenshot');
+                    }
+                } catch (error) {
+                    console.error('Error saving screenshot:', error);
+                }
+            }
+        });
+
+        // Initial load
         window.addEventListener('load', loadScreenshots);
     </script>
 </body>
